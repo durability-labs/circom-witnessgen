@@ -5,3 +5,5 @@ tmp/
 build/
 .ghc.environment.*
 main
+nimble.develop
+nimble.paths
