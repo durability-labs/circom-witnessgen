@@ -1,3 +1,4 @@
+{.push raises: [].}
 
 import std/bitops
 import std/tables
@@ -174,11 +175,14 @@ func evalTresOpNode(op: TresOp, x: F, y: F, z: F): F =
 #-------------------------------------------------------------------------------
 
 func evalNode*( inputs: Table[int,F] , node: Node[F] ): F = 
-  case node.kind:
-    of Input: return inputs[int(node.inp.idx)]
-    of Const: return fromBigUInt(node.kst.bigVal)
-    of Uno:   return evalUnoOpNode( node.uno.op , node.uno.arg1 )
-    of Duo:   return evalDuoOpNode( node.duo.op , node.duo.arg1 , node.duo.arg2 )
-    of Tres:  return evalTresOpNode(node.tres.op, node.tres.arg1, node.tres.arg2, node.tres.arg3 )
+  try:
+    case node.kind:
+      of Input: return inputs[int(node.inp.idx)]
+      of Const: return fromBigUInt(node.kst.bigVal)
+      of Uno:   return evalUnoOpNode( node.uno.op , node.uno.arg1 )
+      of Duo:   return evalDuoOpNode( node.duo.op , node.duo.arg1 , node.duo.arg2 )
+      of Tres:  return evalTresOpNode(node.tres.op, node.tres.arg1, node.tres.arg2, node.tres.arg3 )
+  except KeyError as err:
+    raiseAssert("Key not found in input: " & err.msg)
 
 #-------------------------------------------------------------------------------

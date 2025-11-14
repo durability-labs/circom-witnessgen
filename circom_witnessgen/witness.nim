@@ -1,3 +1,4 @@
+{.push raises: [].}
 
 import std/tables
 import std/strformat
@@ -14,12 +15,14 @@ proc expandInputs*(circuitInputs: seq[(string, SignalDescription)] , inputs: Inp
   for (key, desc) in circuitInputs:
     let k: int = int(desc.length)
     let o: int = int(desc.offset)
-    assert( inputs.hasKey(key) , "input signal `" & key & "` not present" )
-    let list: seq[F] = inputs[key]
-    assert( list.len == k , "input signal `" & key & "` has unexpected size" )
-    for i in 0..<k:
-      table[o + i] = list[i]
-      # echo "input value " & (fToDecimal(list[i])) & " at offset " & ($(o+i))
+    try:
+      let list: seq[F] = inputs[key]
+      assert( list.len == k , "input signal `" & key & "` has unexpected size" )
+      for i in 0..<k:
+        table[o + i] = list[i]
+        # echo "input value " & (fToDecimal(list[i])) & " at offset " & ($(o+i))
+    except KeyError as err:
+      raiseAssert("input signal `" & key & "` not present: " & err.msg)
   return table
 
 # note: this contains temporary values which are not present in the actual witness
